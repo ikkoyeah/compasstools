@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:compasstools/compasstools.dart';
 
 void main() => runApp(MyApp());
@@ -17,15 +15,26 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    checkSensors();
+    checkDeviceSensors();
+
   }
 
-  Future<void> checkSensors() async {
+  Future<void> checkDeviceSensors() async {
+
+    int haveSensor;
+
     try{
-      _haveSensor = await Compasstools.checkSensors;
+      haveSensor = await Compasstools.checkSensors;
+
     } on Exception {
-      _haveSensor = -1;
+
     }
+
+    if (!mounted) return;
+
+    setState(() {
+      _haveSensor = haveSensor;
+    });
   }
 
   @override
@@ -36,9 +45,10 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text("$_haveSensor"),
+          child: Text(_haveSensor.toString()),
         ),
       ),
     );
   }
+
 }
