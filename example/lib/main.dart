@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:compasstools/compasstools.dart';
+import 'package:flutter/services.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(new MyApp());
+  });
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -11,6 +17,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int _haveSensor;
+  String sensorType;
 
   @override
   void initState() {
@@ -25,6 +32,32 @@ class _MyAppState extends State<MyApp> {
 
     try{
       haveSensor = await Compasstools.checkSensors;
+
+      switch(haveSensor) {
+        case 0: {
+          // statements;
+          sensorType="No sensors for Compass";
+        }
+        break;
+
+        case 1: {
+          //statements;
+          sensorType="Accelerometer + Magnetoneter";
+        }
+        break;
+
+        case 2: {
+          //statements;
+          sensorType="Gyroscope";
+        }
+        break;
+
+        default: {
+          //statements;
+          sensorType="Error!";
+        }
+        break;
+      }
 
     } on Exception {
 
@@ -44,10 +77,29 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text(_haveSensor.toString()),
-        ),
+        body: new Container(
+        child: Column(
+        children:<Widget>[StreamBuilder(
+          stream: Compasstools.azimuthStream,
+          builder: (BuildContext context, AsyncSnapshot<int> snapshot){
+            if(snapshot.hasData) {
+              return
+                Padding(
+                  padding: EdgeInsets.all(20),
+                  child:Center(
+                    child:new RotationTransition(turns: new AlwaysStoppedAnimation(-snapshot.data/360),
+                      child: Image.asset("assets/compass.png"),
+                    ),
+                  ),
+                );
+            } else
+              return Text("Error in stream");
+          },
+          ),
+          Text("SensorType: "+sensorType),
+          ],),
       ),
+    ),
     );
   }
 

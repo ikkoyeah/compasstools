@@ -5,5 +5,4 @@ import 'package:compasstools/compasstools.dart';
 void main() {
   const MethodChannel channel = MethodChannel('compasstools');
 
-
 }
